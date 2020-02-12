@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: movieapi
+spec:
+  selector:
+    matchLabels:
+      app: movieapi
+  replicas: 3
+  template: 
+    metadata:
+      labels:
+        app: movieapi
+    spec:
+      containers:
+      - name: movieapi
+        image: zasmlabs/movieapi:latest
+        ports:
+        - containerPort: 80

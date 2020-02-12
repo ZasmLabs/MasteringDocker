@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: moviedb
+spec:
+  selector:
+    matchLabels:
+      app: moviedb
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: moviedb
+    spec:
+      containers:
+      - image: zasmlabs/moviedb
+        name: moviedb
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: password
+        - name: MYSQL_DATABASE
+          value: MvcMovieContext
+        - name: MYSQL_USER
+          value: moviedbadmin
+        - name: MYSQL_PASSWORD
+          value: masteringdocker
+        ports:
+          - containerPort: 3306
+            name: moviedb
+        volumeMounts:
+        - name: moviedb-persistent-storage
+          mountPath: /var/lib/mysql
+        - name: moviedb-initdb
+          mountPath: /docker-entrypoint-initdb.d
+      volumes:
+      - name: moviedb-persistent-storage
+        persistentVolumeClaim:
+          claimName: moviedb-pv-claim
+      - name: moviedb-initdb
+        configMap:
+          name: moviedb-initdb-config
+      

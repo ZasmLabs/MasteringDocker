@@ -1,0 +1,23 @@
+version: '3'
+services:
+  cache:
+    image: redis
+  moviedb:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: masteringdocker
+      MYSQL_DATABASE: MvcMovieContext
+      MYSQL_USER: moviedbadmin
+      MYSQL_PASSWORD: masteringdocker
+    volumes:
+      - ./MvcMovie/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+  web:
+    build: .
+    restart: always
+    ports:
+      - "8000:80"
+    depends_on:
+      - moviedb
+      - cache

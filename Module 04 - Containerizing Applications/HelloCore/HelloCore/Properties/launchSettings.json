@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "HelloCore": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}

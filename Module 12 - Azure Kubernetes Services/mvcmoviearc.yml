@@ -1,0 +1,7 @@
+containers:
+- name: moviedb
+  image: mvcmovieacr.azurecr.io/moviedb:latest
+- name: movieapi
+  image: mvcmovieacr.azurecr.io/movieapi:latest
+- name: movieweb
+  image: mvcmovieacr.azurecr.io/movieweb:latest

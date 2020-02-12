@@ -1,0 +1,76 @@
+version: '3.3'
+services:
+  moviedb:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: masteringdocker
+      MYSQL_DATABASE: MvcMovieContext
+      MYSQL_USER: moviedbadmin
+      MYSQL_PASSWORD: masteringdocker
+    volumes:
+      - C:\Data\MvcMovie:/var/lib/mysql
+      - ./MvcMovie/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      public_net:
+        ipv4_address: ${MVCMOVIE_DB_1_IP}
+  movieapi:
+    build: 
+        context: .
+        dockerfile: Dockerfile.api
+    restart: always
+    ports:
+      - "9000:80"
+    depends_on:
+      - moviedb
+    networks:
+      public_net:
+        ipv4_address: ${MVCMOVIE_API_1_IP}
+  movieweb1:
+    build: 
+        context: .
+        dockerfile: Dockerfile.web
+    restart: always
+    ports:
+      - "8000:80"
+    depends_on:
+      - moviedb
+    networks:
+      public_net:
+        ipv4_address: ${MVCMOVIE_WEB_1_IP}
+  movieweb2:
+    build: 
+        context: .
+        dockerfile: Dockerfile.web
+    restart: always
+    ports:
+      - "8001:80"
+    depends_on:
+      - moviedb
+    networks:
+      public_net:
+        ipv4_address: ${MVCMOVIE_WEB_2_IP}
+  haproxy:
+    image: haproxy
+    ports:
+      - 8080:80
+    expose:
+      - 80
+    networks:
+      public_net:
+         ipv4_address: ${HA_PROXY_IP}
+    environment:
+      - MVCMOVIE_API_1_IP=${MVCMOVIE_API_1_IP}
+      - MVCMOVIE_WEB_1_IP=${MVCMOVIE_WEB_1_IP}
+      - MVCMOVIE_WEB_2_IP=${MVCMOVIE_WEB_2_IP}
+      - MVCMOVIE_EXPOSED_PORT=${MVCMOVIE_EXPOSED_PORT}
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+networks:
+  public_net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: ${NETWORK_SUBNET}
